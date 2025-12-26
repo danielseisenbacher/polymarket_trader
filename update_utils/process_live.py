@@ -4,7 +4,6 @@ warnings.filterwarnings('ignore')
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import polars as pl
 from poly_utils.utils import get_markets, update_missing_tokens
 
@@ -16,6 +15,7 @@ def get_processed_df(df):
     markets_df = get_markets()
     markets_df = markets_df.rename({'id': 'market_id'})
 
+    print("step 0")
     # 1) Make markets long: (market_id, side, asset_id) where side ∈ {"token1", "token2"}
     markets_long = (
         markets_df
@@ -24,6 +24,7 @@ def get_processed_df(df):
             variable_name="side", value_name="asset_id")
     )
 
+    print("step 1")
     # 2) Identify the non-USDC asset for each trade (the one that isn't 0)
     df = df.with_columns(
         pl.when(pl.col("makerAssetId") != "0")
@@ -32,6 +33,7 @@ def get_processed_df(df):
         .alias("nonusdc_asset_id")
     )
 
+    print("step 2")
     # 3) Join once on that non-USDC asset to recover the market + side ("token1" or "token2")
     df = df.join(
         markets_long,
@@ -40,6 +42,7 @@ def get_processed_df(df):
         how="left",
     )
 
+    print("step 3")
     # 4) label columns and keep market_id
     df = df.with_columns([
         pl.when(pl.col("makerAssetId") == "0").then(pl.lit("USDC")).otherwise(pl.col("side")).alias("makerAsset"),
@@ -47,13 +50,16 @@ def get_processed_df(df):
         pl.col("market_id"),
     ])
 
+    print("step 4")
     df = df[['timestamp', 'market_id', 'maker', 'makerAsset', 'makerAmountFilled', 'taker', 'takerAsset', 'takerAmountFilled', 'transactionHash']]
 
+    print("step 5")
     df = df.with_columns([
         (pl.col("makerAmountFilled") / 10**6).alias("makerAmountFilled"),
         (pl.col("takerAmountFilled") / 10**6).alias("takerAmountFilled"),
     ])
 
+    print("step 6")
     df = df.with_columns(
         pl.when(pl.col("takerAsset") == "USDC")
         .then(pl.lit("BUY"))
@@ -61,6 +67,7 @@ def get_processed_df(df):
         .alias("taker_direction")
     )
 
+    print("step 7")
     df = df.with_columns([
         pl.when(pl.col("takerAsset") == "USDC")
         .then(pl.lit("BUY"))
@@ -74,6 +81,7 @@ def get_processed_df(df):
         .alias("maker_direction"),
     ])
 
+    print("step 8")
     df = df.with_columns([
         pl.when(pl.col("makerAsset") != "USDC")
         .then(pl.col("makerAsset"))
@@ -95,7 +103,7 @@ def get_processed_df(df):
         .alias("price")
     ])
 
-
+    print("step 9")
     df = df[['timestamp', 'market_id', 'maker', 'taker', 'nonusdc_side', 'maker_direction', 'taker_direction', 'price', 'usd_amount', 'token_amount', 'transactionHash']]
     return df
 
@@ -133,7 +141,15 @@ def process_live():
         "makerAssetId": pl.Utf8,
     }
 
-    df = pl.scan_csv("goldsky/orderFilled.csv", schema_overrides=schema_overrides).collect(streaming=True)
+    path = "goldsky/orderFilled.csv"
+    if not os.path.exists(path):
+        path = "/home/seisi/Desktop/Privat/Programmierung/polymarket_trader/goldsky/orderFilled.csv"
+
+
+    df = pl.scan_csv(path, schema_overrides=schema_overrides).collect(streaming=True)
+
+    print("substep")
+
     df = df.with_columns(
         pl.from_epoch(pl.col('timestamp'), time_unit='s').alias('timestamp')
     )
