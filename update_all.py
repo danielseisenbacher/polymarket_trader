@@ -1,7 +1,9 @@
-from update_markets import update_markets_to_duckdb
-from update_goldsky_orderbook import update_goldsky_orderbook_to_duckdb
-from update_goldsky_activities import update_goldsky_activities_to_duckdb
-from process_markets_and_goldsky import combine_markets_and_goldsky
+from updating_logic.update_markets import update_markets_to_duckdb
+from updating_logic.update_goldsky_orderbook import update_goldsky_orderbook_to_duckdb
+from updating_logic.update_goldsky_activities import update_goldsky_activities_to_duckdb
+from updating_logic.update_goldsky_positions import update_goldsky_positions
+
+
 if __name__ == "__main__":
     print("\n\n\n")
     print("#"*150)
@@ -30,10 +32,18 @@ if __name__ == "__main__":
     print("\n\n\n")
     print("#" * 150)
     print("STEP 4")
-    print("POSTPROCESSING")
+    print("UPDATING POSITIONS GOLDSKY")
     print("#" * 150)
     print("\n\n\n")
-    #combine_markets_and_goldsky()
+    update_goldsky_positions()
+
+    print("\n\n\n")
+    print("#" * 150)
+    print("STEP 4")
+    print("UPDATING POSITIONS GOLDSKY")
+    print("#" * 150)
+    print("\n\n\n")
+    update_goldsky_positions()
 
     print("\n\n\n")
     print("#" * 150)

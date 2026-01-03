@@ -28,7 +28,7 @@ def create_worker_files(nr_workers: int) -> list:
     """Create worker CSV files with headers and return list of file paths"""
 
     # Use pathlib for cleaner path handling
-    worker_dir = Path("workers")
+    worker_dir = Path("../workers")
     worker_dir.mkdir(exist_ok=True)
 
     # Find the next available worker number
@@ -51,7 +51,7 @@ def create_worker_files(nr_workers: int) -> list:
 def get_multi_scrape_timestamps(db_last_sync: tuple):
 
     timestamps = []
-    workers = [os.path.join("workers", worker) for worker in os.listdir("workers")]
+    workers = [os.path.join("../workers", worker) for worker in os.listdir("../workers")]
     for worker in workers:
         worker_timestamp = get_first_and_last_timestamp(worker)
         timestamps.append(worker_timestamp)
@@ -383,11 +383,11 @@ def write_workers_to_duckdb(duck_db_path="polymarket.duckdb"):
     con = duckdb.connect(duck_db_path)
     chunk_size = 10000000
 
-    workers_dir = Path("workers").absolute()
+    workers_dir = Path("../workers").absolute()
 
-    for count, worker in enumerate(os.listdir("workers")):
+    for count, worker in enumerate(os.listdir("../workers")):
         print("+" * 50)
-        print(f"{count+1}/{len(os.listdir("workers"))}Processing {worker}...")
+        print(f"{count+1}/{len(os.listdir("../workers"))}Processing {worker}...")
         print("+" * 50)
 
         worker_path = workers_dir / worker
@@ -420,9 +420,9 @@ def write_workers_to_duckdb(duck_db_path="polymarket.duckdb"):
 
 def cleanup_worker_files():
     """Delete all worker files after loading is complete"""
-    if os.path.exists("workers"):
-        file_count = len(os.listdir("workers"))
-        shutil.rmtree("workers")
+    if os.path.exists("../workers"):
+        file_count = len(os.listdir("../workers"))
+        shutil.rmtree("../workers")
         print(f"\n{'=' * 50}")
         print(f"✓ Cleaned up {file_count} worker files")
         print(f"{'=' * 50}\n")
@@ -434,7 +434,7 @@ def cleanup_worker_files():
 def update_goldsky_orderbook_to_duckdb(duck_db_path="polymarket.duckdb", last_time_missing_intervals=None):
 
     # Create workers directory if it doesn't exist
-    workers_dir = Path("workers").absolute()
+    workers_dir = Path("../workers").absolute()
     workers_dir.mkdir(exist_ok=True)
 
     NR_WORKERS = 120

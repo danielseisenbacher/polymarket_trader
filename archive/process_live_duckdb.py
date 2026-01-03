@@ -154,7 +154,7 @@ def get_last_processed_timestamp(con):
 
 
 def process_live():
-    db_path = 'polymarket.duckdb'
+    db_path = '../polymarket.duckdb'
 
     print("=" * 60)
     print("🔄 Processing Live Trades with DuckDB")
@@ -251,7 +251,7 @@ def process_live():
 
 def example_queries():
     """Example queries you can now run efficiently"""
-    con = duckdb.connect('polymarket.duckdb')
+    con = duckdb.connect('../polymarket.duckdb')
 
     print("\n" + "=" * 60)
     print("📊 Example Queries")

@@ -354,6 +354,6 @@ def combine_markets_and_goldsky(updated_market_ids=None, db_path='polymarket.duc
 if __name__ == "__main__":
     # Run the processing
     combine_markets_and_goldsky(
-        db_path='polymarket.duckdb',
+        db_path='../polymarket.duckdb',
         batch_delta_seconds=500000  # Process 1 week at a time
     )

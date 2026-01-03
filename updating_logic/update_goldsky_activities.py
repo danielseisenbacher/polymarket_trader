@@ -144,7 +144,7 @@ def get_missing_intervals(timestamps_wo_overlap: list) -> list:
             if end+1 < SCRIPT_STARTING_TIME:
                 missing_intervals.append([end + 1, SCRIPT_STARTING_TIME])
 
-    return missing_intervals
+    return missing_inresulttervals
 
 
 def balance_load(missing_intervals: list, nr_workers: int):
